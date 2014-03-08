@@ -42,13 +42,10 @@ static_assert((qnumber(i0_Ins_Opnd_Cnt) == I0_ins_last_ins), "i0 ins opt number 
 
 //static_assert((sizeof(op_t) == (2+2+4+8)), "check op_t size");
 
-static void i0_check_bound(i0_ea_type_t ea, size_t range)
-{
-	if(ea>= I0_MEMSPACE_PROGLOAD_BASE)
-	{
-		ea-=I0_MEMSPACE_PROGLOAD_BASE;
-		if((ea + range)<=i0_prog_size)
-		{
+static void i0_check_bound(i0_ea_type_t ea, size_t range) {
+	if (ea >= I0_MEMSPACE_PROGLOAD_BASE) {
+		ea -= I0_MEMSPACE_PROGLOAD_BASE;
+		if ((ea + range) <= i0_prog_size) {
 			return;
 		}
 	}
@@ -57,22 +54,22 @@ static void i0_check_bound(i0_ea_type_t ea, size_t range)
 
 static uint8_t i0_get_byte(i0_ea_type_t ea) {
 	i0_check_bound(ea, sizeof(uint8_t));
-	return *((uint8_t*)ea);
+	return *((uint8_t*) ea);
 }
 
 static uint16_t i0_get_word(i0_ea_type_t ea) {
 	i0_check_bound(ea, sizeof(uint16_t));
-	return *((uint16_t*)ea);
+	return *((uint16_t*) ea);
 }
 
 static uint32_t i0_get_dword(i0_ea_type_t ea) {
 	i0_check_bound(ea, sizeof(uint32_t));
-	return *((uint32_t*)ea);
+	return *((uint32_t*) ea);
 }
 
 static uint64_t i0_get_qword(i0_ea_type_t ea) {
 	i0_check_bound(ea, sizeof(uint64_t));
-	return *((uint64_t*)ea);
+	return *((uint64_t*) ea);
 }
 
 i0_opcode4_t::i0_opcode4_t(insn_t& _cmd) :
@@ -112,8 +109,8 @@ void insn_t::check_oper(op_t& op) {
 	check_oper(op, ins_attr);
 }
 
-static uint8_t i0_imm_bytelen[] = { 1, 8, 16, 4, 1, 8, 16, 4, 4, 8, 0, 0, 0,
-		0, 0, 0, };
+static uint8_t i0_imm_bytelen[] = { 1, 8, 16, 4, 1, 8, 16, 4, 4, 8, 0, 0, 0, 0,
+		0, 0, };
 static_assert((qnumber(i0_imm_bytelen) == (1<<I0_INS_BIT_LEN_ATTR)), "");
 
 void insn_t::check_oper_C(op_t& op) {
@@ -127,8 +124,7 @@ void insn_t::check_oper_C_indir(op_t& op) {
 	br_type |= I0_INS_BR_TARGET_UNDETERMINE;
 	check_oper_M(op, I0_ATTR_UE);
 	if (op.addrm == I0_ADDRM_INDIRECT) {
-		if((*(uint64_t*)i0_op_raw_ptr(op)) == I0_MEMSPACE_STACK_POINTER)
-		{
+		if ((*(uint64_t*) i0_op_raw_ptr(op)) == I0_MEMSPACE_STACK_POINTER) {
 			br_type |= I0_INS_BR_RET;
 		}
 	}
@@ -425,7 +421,7 @@ uint8_t insn_t::ins_fetch_byte() {
 	ins_size += sizeof(uint8_t);
 	return ret;
 }
-void insn_t::ins_check_byte(){
+void insn_t::ins_check_byte() {
 	i0_check_bound(ip, sizeof(uint8_t));
 }
 uint16_t insn_t::ins_fetch_word() {
@@ -433,7 +429,7 @@ uint16_t insn_t::ins_fetch_word() {
 	ins_size += sizeof(uint16_t);
 	return ret;
 }
-void insn_t::ins_check_word(){
+void insn_t::ins_check_word() {
 	i0_check_bound(ip, sizeof(uint16_t));
 }
 uint32_t insn_t::ins_fetch_dword() {
@@ -441,7 +437,7 @@ uint32_t insn_t::ins_fetch_dword() {
 	ins_size += sizeof(uint32_t);
 	return ret;
 }
-void insn_t::ins_check_dword(){
+void insn_t::ins_check_dword() {
 	i0_check_bound(ip, sizeof(uint32_t));
 }
 uint64_t insn_t::ins_fetch_qword() {
@@ -449,11 +445,28 @@ uint64_t insn_t::ins_fetch_qword() {
 	ins_size += sizeof(uint64_t);
 	return ret;
 }
-void insn_t::ins_check_qword(){
+void insn_t::ins_check_qword() {
 	i0_check_bound(ip, sizeof(uint64_t));
 }
 
+i0_ea_type_t insn_t::get_br_target() {
+	return *((i0_ea_type_t*) (ip + opnds[br_opnd].ins_offset));
+}
+
+uint8_t insn_t::get_br_type() {
+	return br_type & I0_INS_BR_TYPE_MASK;
+}
+
+bool insn_t::is_br_target_known() {
+	return !(br_type & I0_INS_BR_TARGET_TYPE_MASK);
+}
+
+bool insn_t::is_ret() {
+	return br_type & I0_INS_BR_RET_MASK;
+}
+
 int main(int argc, char** argv) {
+	(void) argc;
 	int i0_prog_fd = open(argv[1], O_RDONLY);
 	if (i0_prog_fd < 0) {
 		exit(-1);
@@ -461,8 +474,11 @@ int main(int argc, char** argv) {
 	struct stat file_info;
 	fstat(i0_prog_fd, &file_info);
 	i0_prog_size = file_info.st_size;
-	void* mapped_text_seg = mmap(NULL, i0_prog_size, PROT_READ, MAP_PRIVATE,
-			i0_prog_fd, 0);
+	void* mapped_text_seg = mmap((void*) I0_MEMSPACE_PROGLOAD_BASE,
+			i0_prog_size, PROT_READ, MAP_PRIVATE, i0_prog_fd, 0);
+	if (((i0_ea_type_t) mapped_text_seg) != I0_MEMSPACE_PROGLOAD_BASE) {
+		exit(-2);
+	}
 
 	return 0;
 }

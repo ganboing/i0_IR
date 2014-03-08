@@ -154,6 +154,10 @@ public:
 class insn_t {
 public:
 	insn_t(i0_ea_type_t _ip);
+	i0_ea_type_t get_br_target();
+	uint8_t get_br_type();
+	bool is_br_target_known();
+	bool is_ret();
 	~insn_t();
 private:
 	insn_t();
@@ -172,7 +176,6 @@ private:
 	void ins_check_dword();
 	void ins_check_qword();
 	void* i0_op_raw_ptr(op_t& op);
-
 	i0_ea_type_t ip;
 	i0_ins_names op_name;
 	I0_ins_options opt;
