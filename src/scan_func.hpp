@@ -16,7 +16,7 @@ typedef uint64_t i0_val_type_t;
 
 #pragma pack(push, 1)
 
-enum I0_ins_options {
+enum __attribute__ ((__packed__)) I0_ins_options {
 	i0_ins_opt_pref_b_le,
 	i0_ins_opt_pref_b_l,
 	i0_ins_opt_pref_b_e,
@@ -33,7 +33,7 @@ enum I0_ins_options {
 
 static_assert((sizeof(I0_ins_options)==1), "");
 
-enum i0_ins_names {
+enum __attribute__ ((__packed__)) i0_ins_names {
 	I0_ins_conv,
 	I0_ins_add,
 	I0_ins_sub,
