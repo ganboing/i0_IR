@@ -5,7 +5,7 @@ CXXFLAGS=-g3 -Wall -Wextra -std=c++0x
 all: scan_func
 
 scan_func: src/scan_func.cpp src/scan_func.hpp src/i0_mem_layout.h
-	$(CXX) $(CXXFLAGS) -c src/scan_func.cpp bin/scan_func.o
+	$(CXX) $(CXXFLAGS) -c -o bin/scan_func.o src/scan_func.cpp 
 
 clean:
 	rm bin/scan_func.o
