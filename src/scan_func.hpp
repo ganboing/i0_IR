@@ -14,7 +14,6 @@ typedef uint64_t i0_val_type_t;
 #define I0_DECODE_STATUS_TEXT_SEGMENT		(6U)
 #define I0_MAX_OPND_NUMBER	5
 
-#pragma pack(push, 1)
 
 enum __attribute__ ((__packed__)) I0_ins_options {
 	i0_ins_opt_pref_b_le,
@@ -60,7 +59,7 @@ enum __attribute__ ((__packed__)) i0_ins_names {
 
 static_assert((sizeof(i0_ins_names)==1), "");
 
-enum i0_instr_addrm {
+enum __attribute__ ((__packed__)) i0_instr_addrm {
 	i0_addrm_Imm = 0,
 	i0_addrm_Abs = 1,
 	i0_addrm_Indir = 2,
@@ -68,7 +67,7 @@ enum i0_instr_addrm {
 	i0_addrm_last
 };
 
-enum i0_oper_attr {
+enum __attribute__ ((__packed__)) i0_oper_attr {
 	i0_attr_sb = 0,
 	i0_attr_se = 1,
 	i0_attr_ss = 2,
@@ -82,7 +81,7 @@ enum i0_oper_attr {
 	i0_attr_last
 };
 
-enum I0_regs {
+enum __attribute__ ((__packed__)) I0_regs {
 	i0_reg_BP,
 	i0_reg_SP,
 	i0_reg_R2,
@@ -104,7 +103,6 @@ enum I0_regs {
 	i0_reg_I0_regs_last
 };
 
-#pragma pack(pop)
 
 struct op_mem_desp {
 	int32_t displ;

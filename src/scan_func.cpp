@@ -112,8 +112,8 @@ void insn_t::check_oper(op_t& op) {
 	check_oper(op, ins_attr);
 }
 
-static uint8_t i0_imm_bytelen[] = { 1, 8, 16, 4, 1, 8, 16, 4, 4, 8, -1, -1, -1,
-		-1, -1, -1, };
+static uint8_t i0_imm_bytelen[] = { 1, 8, 16, 4, 1, 8, 16, 4, 4, 8, 0, 0, 0,
+		0, 0, 0, };
 static_assert((qnumber(i0_imm_bytelen) == (1<<I0_INS_BIT_LEN_ATTR)), "");
 
 void insn_t::check_oper_C(op_t& op) {
